@@ -45,7 +45,7 @@ export function AIAssistantChat() {
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-24 right-8 w-96 h-96 bg-white rounded-2xl shadow-2xl border border-border flex flex-col z-40 overflow-hidden">
+        <div className="fixed inset-0 sm:inset-auto sm:bottom-24 sm:right-8 sm:w-96 sm:h-96 bg-white sm:rounded-2xl shadow-2xl border border-border flex flex-col z-40 overflow-hidden">
           {/* Header */}
           <div className="bg-gradient-to-r from-primary to-accent text-white p-4 flex items-center justify-between">
             <div>

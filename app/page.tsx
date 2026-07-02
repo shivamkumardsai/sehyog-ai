@@ -1,5 +1,3 @@
-'use client'
-
 import Image from 'next/image'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -56,9 +54,11 @@ export default function Page() {
           </div>
 
           <div className="flex items-center gap-4">
-            <Button variant="outline" className="hidden sm:inline-flex">
-              Login
-            </Button>
+            <Link href="/dashboard">
+              <Button variant="outline" className="hidden sm:inline-flex">
+                Login
+              </Button>
+            </Link>
             <Link href="/dashboard">
               <Button className="bg-primary hover:bg-primary/90">Get Started</Button>
             </Link>
@@ -114,18 +114,18 @@ export default function Page() {
                 <div className="p-6 bg-gradient-to-br from-white to-muted/20 space-y-6">
                   {/* Top stats */}
                   <div className="grid grid-cols-3 gap-4">
-                    <div className="bg-white p-4 rounded-xl border border-border">
+                    <div className="bg-white p-4 sm:p-8 rounded-xl border border-border">
                       <div className="text-sm text-muted-foreground">Patient Name</div>
                       <div className="font-bold text-foreground mt-1">Rajesh Kumar</div>
                     </div>
-                    <div className="bg-white p-4 rounded-xl border border-border">
+                    <div className="bg-white p-4 sm:p-8 rounded-xl border border-border">
                       <div className="text-sm text-muted-foreground">Recovery Score</div>
                       <div className="font-bold text-accent mt-1 flex items-center gap-2">
                         <Activity className="w-4 h-4" />
                         82%
                       </div>
                     </div>
-                    <div className="bg-white p-4 rounded-xl border border-border">
+                    <div className="bg-white p-4 sm:p-8 rounded-xl border border-border">
                       <div className="text-sm text-muted-foreground">Status</div>
                       <div className="font-bold text-primary mt-1">On Track</div>
                     </div>
@@ -561,26 +561,28 @@ export default function Page() {
             </p>
           </div>
 
-              <div className="flex gap-4 justify-center flex-col sm:flex-row">
-                <Link href="/dashboard">
-                  <Button size="lg" className="bg-white text-primary hover:bg-gray-100">
-                    Get Started
-                    <ArrowRight className="ml-2 w-4 h-4" />
-                  </Button>
-                </Link>
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-2 border-white text-white hover:bg-white/10"
-            >
-              Explore Dashboard
-            </Button>
+          <div className="flex gap-4 justify-center flex-col sm:flex-row">
+            <Link href="/dashboard">
+              <Button size="lg" className="bg-white text-primary hover:bg-gray-100">
+                Get Started
+                <ArrowRight className="ml-2 w-4 h-4" />
+              </Button>
+            </Link>
+            <Link href="/dashboard">
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-2 border-white text-white hover:bg-white/10"
+              >
+                Explore Dashboard
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-foreground text-white">
+      <footer id="about" className="bg-foreground text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="grid md:grid-cols-4 gap-8 mb-12">
             <div className="space-y-4">

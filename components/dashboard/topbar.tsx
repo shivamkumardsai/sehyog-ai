@@ -4,9 +4,9 @@ import { Search, Bell, User } from 'lucide-react'
 
 export function TopBar() {
   return (
-    <div className="h-16 border-b border-border bg-white flex items-center justify-between px-8">
+    <div className="h-16 border-b border-border bg-white flex items-center justify-between px-4 sm:px-8">
       {/* Search Bar */}
-      <div className="flex-1 max-w-sm">
+      <div className="flex-1 max-w-full sm:max-w-sm">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
           <input
@@ -18,7 +18,7 @@ export function TopBar() {
       </div>
 
       {/* Right Icons */}
-      <div className="flex items-center gap-6 ml-8">
+      <div className="flex items-center gap-4 ml-4 sm:ml-8">
         {/* Notifications */}
         <button className="relative p-2 text-muted-foreground hover:text-foreground transition">
           <Bell className="w-6 h-6" />

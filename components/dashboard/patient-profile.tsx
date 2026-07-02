@@ -1,9 +1,13 @@
 'use client'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { User, Calendar, Stethoscope, Heart, Droplet, Globe } from 'lucide-react'
+import { User, Calendar, Stethoscope, Heart, Activity } from 'lucide-react'
+import { useLatestAnalysis } from '@/components/providers/dashboard-data-provider'
 
 export function PatientProfile() {
+  const user = { name: 'Shivam Kumar', email: 'shivam@example.com' }
+  const analysis = useLatestAnalysis()
+
   return (
     <Card className="bg-gradient-to-br from-primary/5 to-accent/5 border-primary/20">
       <CardHeader>
@@ -11,64 +15,72 @@ export function PatientProfile() {
       </CardHeader>
       <CardContent>
         <div className="flex gap-8">
-          {/* Profile Avatar & Basic Info */}
           <div className="flex flex-col items-center">
             <div className="w-24 h-24 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-white mb-4 shadow-lg">
               <User className="w-12 h-12" />
             </div>
-            <h3 className="text-xl font-bold text-foreground">Sunita Devi</h3>
-            <p className="text-sm text-muted-foreground">Post Knee Replacement</p>
+            <h3 className="text-xl font-bold text-foreground">
+              {user?.name ?? 'Caregiver'}
+            </h3>
+            <p className="text-sm text-muted-foreground text-center">
+              {analysis?.conditions[0] ?? 'Post-hospital recovery'}
+            </p>
           </div>
 
-          {/* Profile Details Grid */}
           <div className="flex-1">
             <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-              {/* Age */}
               <div className="bg-white p-4 rounded-lg border border-border">
-                <p className="text-xs text-muted-foreground mb-1">Age</p>
-                <p className="text-lg font-bold text-foreground">58</p>
+                <p className="text-xs text-muted-foreground mb-1">Recovery Score</p>
+                <p className="text-lg font-bold text-foreground">
+                  {analysis ? `${analysis.recoveryScore}%` : '—'}
+                </p>
               </div>
 
-              {/* Recovery Day */}
               <div className="bg-white p-4 rounded-lg border border-border">
                 <div className="flex items-center gap-2 mb-1">
                   <Calendar className="w-3 h-3 text-accent" />
-                  <p className="text-xs text-muted-foreground">Recovery Day</p>
+                  <p className="text-xs text-muted-foreground">Risk Level</p>
                 </div>
-                <p className="text-lg font-bold text-foreground">12</p>
+                <p className="text-lg font-bold text-foreground capitalize">
+                  {analysis?.risk ?? 'Unknown'}
+                </p>
               </div>
 
-              {/* Doctor */}
               <div className="bg-white p-4 rounded-lg border border-border">
                 <div className="flex items-center gap-2 mb-1">
                   <Stethoscope className="w-3 h-3 text-primary" />
-                  <p className="text-xs text-muted-foreground">Doctor</p>
+                  <p className="text-xs text-muted-foreground">Conditions</p>
                 </div>
-                <p className="text-sm font-bold text-foreground">Dr Amit Kumar</p>
+                <p className="text-sm font-bold text-foreground">
+                  {analysis?.conditions.length ?? 0} detected
+                </p>
               </div>
 
-              {/* Hospital */}
-              <div className="bg-white p-4 rounded-lg border border-border">
-                <p className="text-xs text-muted-foreground mb-1">Hospital</p>
-                <p className="text-sm font-bold text-foreground">AIIMS Patna</p>
-              </div>
-
-              {/* Blood Group */}
               <div className="bg-white p-4 rounded-lg border border-border">
                 <div className="flex items-center gap-2 mb-1">
-                  <Droplet className="w-3 h-3 text-red-500" />
-                  <p className="text-xs text-muted-foreground">Blood Group</p>
+                  <Heart className="w-3 h-3 text-red-500" />
+                  <p className="text-xs text-muted-foreground">Medicines</p>
                 </div>
-                <p className="text-lg font-bold text-foreground">B+</p>
+                <p className="text-sm font-bold text-foreground">
+                  {analysis?.medicines.length ?? 0} prescribed
+                </p>
               </div>
 
-              {/* Language */}
               <div className="bg-white p-4 rounded-lg border border-border">
                 <div className="flex items-center gap-2 mb-1">
-                  <Globe className="w-3 h-3 text-blue-500" />
-                  <p className="text-xs text-muted-foreground">Language</p>
+                  <Activity className="w-3 h-3 text-blue-500" />
+                  <p className="text-xs text-muted-foreground">AI Confidence</p>
                 </div>
-                <p className="text-sm font-bold text-foreground">Hindi</p>
+                <p className="text-lg font-bold text-foreground">
+                  {analysis ? `${analysis.confidence}%` : '—'}
+                </p>
+              </div>
+
+              <div className="bg-white p-4 rounded-lg border border-border">
+                <p className="text-xs text-muted-foreground mb-1">Caregiver</p>
+                <p className="text-sm font-bold text-foreground truncate">
+                  {user?.email ?? 'Not signed in'}
+                </p>
               </div>
             </div>
           </div>

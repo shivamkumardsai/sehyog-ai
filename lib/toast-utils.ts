@@ -2,27 +2,23 @@ import { toast } from 'sonner'
 
 export const showToasts = {
   success: (title: string, description?: string) => {
-    toast.success(title, {
-      description,
-    })
+    toast.success(title, { description })
   },
 
   error: (title: string, description?: string) => {
-    toast.error(title, {
-      description,
-    })
+    toast.error(title, { description })
   },
 
   info: (title: string, description?: string) => {
-    toast.info(title, {
-      description,
-    })
+    toast.info(title, { description })
   },
 
   loading: (title: string, description?: string) => {
-    return toast.loading(title, {
-      description,
-    })
+    return toast.loading(title, { description })
+  },
+
+  dismiss: (id?: string | number) => {
+    toast.dismiss(id)
   },
 
   promise: <T,>(

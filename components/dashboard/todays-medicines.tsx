@@ -1,35 +1,51 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { showToasts } from '@/lib/toast-utils'
 import { Pill, Check, Clock } from 'lucide-react'
+import { useLatestAnalysis } from '@/components/providers/dashboard-data-provider'
 
-const initialMedicines = [
-  {
-    time: 'Morning',
-    status: 'completed',
-    medicines: ['Aspirin 75mg', 'Vitamin D 1000 IU'],
-  },
-  {
-    time: 'Afternoon',
-    status: 'pending',
-    medicines: ['Lisinopril 5mg', 'Metformin 500mg'],
-  },
-  {
-    time: 'Evening',
-    status: 'pending',
-    medicines: ['Atorvastatin 10mg', 'B-Complex'],
-  },
-]
+interface MedicineSlot {
+  time: string
+  status: 'completed' | 'pending'
+  medicines: string[]
+}
 
 export function TodaysMedicines() {
-  const [medicines, setMedicines] = useState(initialMedicines)
+  const analysis = useLatestAnalysis()
+  const [medicines, setMedicines] = useState<MedicineSlot[]>([])
+
+  useEffect(() => {
+    const meds = analysis?.medicines ?? []
+    if (meds.length === 0) {
+      setMedicines([
+        {
+          time: 'Morning',
+          status: 'pending',
+          medicines: ['Upload a report to extract medicines'],
+        },
+      ])
+      return
+    }
+
+    const chunkSize = Math.ceil(meds.length / 3)
+    const slots = ['Morning', 'Afternoon', 'Evening']
+    setMedicines(
+      slots
+        .map((time, index) => ({
+          time,
+          status: index === 0 ? 'completed' as const : 'pending' as const,
+          medicines: meds.slice(index * chunkSize, (index + 1) * chunkSize),
+        }))
+        .filter((slot) => slot.medicines.length > 0)
+    )
+  }, [analysis])
 
   const handleMarkComplete = (time: string) => {
     setMedicines(
       medicines.map((slot) =>
-        slot.time === time ? { ...slot, status: 'completed' } : slot
+        slot.time === time ? { ...slot, status: 'completed' as const } : slot
       )
     )
     showToasts.medicineReminderSaved()

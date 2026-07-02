@@ -1,5 +1,6 @@
 import { Sidebar } from '@/components/dashboard/sidebar'
 import { TopBar } from '@/components/dashboard/topbar'
+import { DashboardDataProvider } from '@/components/providers/dashboard-data-provider'
 import { PatientProfile } from '@/components/dashboard/patient-profile'
 import { RecoverySummary } from '@/components/dashboard/recovery-summary'
 import { TodaysMedicines } from '@/components/dashboard/todays-medicines'
@@ -11,11 +12,13 @@ import { UpcomingAppointment } from '@/components/dashboard/upcoming-appointment
 import { HealthAlerts } from '@/components/dashboard/health-alerts'
 import { UploadMedicalReport } from '@/components/dashboard/upload-medical-report'
 import { AIMedicalSummary } from '@/components/dashboard/ai-medical-summary'
+import { DashboardStatsCards } from '@/components/dashboard/dashboard-stats-cards'
 import { EmergencyAssistance } from '@/components/dashboard/emergency-assistance'
 import { AIAssistantChat } from '@/components/dashboard/ai-assistant-chat'
 
 export default function DashboardPage() {
   return (
+    <DashboardDataProvider>
     <div className="flex h-screen bg-background">
       {/* Sidebar */}
       <Sidebar />
@@ -27,8 +30,8 @@ export default function DashboardPage() {
 
         {/* Dashboard Content */}
         <main className="flex-1 overflow-auto">
-          <div className="p-8 max-w-7xl mx-auto space-y-8">
-            {/* Patient Profile Card */}
+          <div className="p-4 sm:p-8 max-w-7xl mx-auto space-y-8">
+            <DashboardStatsCards />
             <PatientProfile />
 
             {/* Main Grid Layout */}
@@ -61,5 +64,6 @@ export default function DashboardPage() {
         </main>
       </div>
     </div>
+    </DashboardDataProvider>
   )
 }

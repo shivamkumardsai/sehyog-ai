@@ -1,13 +1,20 @@
+'use client'
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Brain, Lightbulb } from 'lucide-react'
+import { useLatestAnalysis, useDashboardData } from '@/components/providers/dashboard-data-provider'
+import { useMemo } from 'react'
 
 export function RecoverySummary() {
-  const recommendations = [
-    'Today\'s recovery is progressing well.',
-    'Continue medicines as prescribed.',
-    'Walk for 20 minutes to improve mobility.',
-    'Stay hydrated - drink 8-10 glasses of water daily.',
-  ]
+  const analysis = useLatestAnalysis()
+  const { loading } = useDashboardData()
+
+  const recommendations = useMemo(() => {
+    if (loading) return ['Loading AI summary...']
+    if (analysis?.recommendations?.length) return analysis.recommendations
+    if (analysis?.summary) return [analysis.summary]
+    return ['Upload a medical report to receive personalized AI recovery guidance.']
+  }, [analysis, loading])
 
   return (
     <Card className="border border-border">
