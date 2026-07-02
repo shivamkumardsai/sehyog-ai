@@ -16,8 +16,7 @@
     "clsx": "^2.1.1",
     "lucide-react": "^1.16.0",
     "next": "16.2.6",
-    "pdf2json": "^4.0.3",
-    "pdfjs-dist": "^6.1.200",
+    "pdf-parse": "^1.1.1",
     "react": "^19",
     "react-dom": "^19",
     "sonner": "^2.0.7",
@@ -27,6 +26,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4.2.0",
     "@types/node": "^24",
+    "@types/pdf-parse": "^1.1.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "postcss": "^8.5",

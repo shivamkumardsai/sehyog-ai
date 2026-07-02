@@ -1,24 +1,8 @@
-import * as pdfjs from 'pdfjs-dist/legacy/build/pdf.mjs'
+import pdfParse from 'pdf-parse'
 
 export async function extractTextFromPdf(buffer: Buffer): Promise<string> {
-  const loadingTask = pdfjs.getDocument({
-    data: new Uint8Array(buffer),
-    useSystemFonts: true,
-  })
-
-  const pdf = await loadingTask.promise
-  const pages: string[] = []
-
-  for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-    const page = await pdf.getPage(pageNum)
-    const textContent = await page.getTextContent()
-    const pageText = textContent.items
-      .map((item) => ('str' in item ? item.str : ''))
-      .join(' ')
-    pages.push(pageText)
-  }
-
-  const text = pages.join('\n').trim()
+  const data = await pdfParse(buffer)
+  const text = typeof data.text === 'string' ? data.text.trim() : ''
 
   if (!text || text.length < 10) {
     throw new Error(
