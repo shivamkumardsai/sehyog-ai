@@ -1,0 +1,73 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum MedicalReportStatus {
+  PROCESSING
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+model MedicalReport {
+  id            String             @id @map("_id") @default(auto()) @db.ObjectId
+  userId        String
+  fileName      String
+  fileType      String
+  fileSize      Int
+  status        MedicalReportStatus
+  extractedText String?
+  createdAt     DateTime           @default(now())
+  analysis      AnalysisResult?    @relation("ReportAnalysis")
+  uploadHistory UploadHistory?     @relation("ReportUploadHistory")
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model AnalysisResult {
+  id            String          @id @map("_id") @default(auto()) @db.ObjectId
+  reportId      String          @unique
+  summary       String
+  risk          String
+  recoveryScore Int
+  conditions    String
+  medicines     String
+  recommendations String
+  warnings      String
+  followUp      String
+  doctorAdvice  String
+  confidence    Float
+  rawResponse   String
+  createdAt     DateTime        @default(now())
+  report        MedicalReport   @relation("ReportAnalysis", fields: [reportId], references: [id])
+
+  @@index([createdAt])
+}
+
+model UploadHistory {
+  id        String          @id @map("_id") @default(auto()) @db.ObjectId
+  reportId  String          @unique
+  action    String
+  status    MedicalReportStatus
+  createdAt DateTime        @default(now())
+  report    MedicalReport   @relation("ReportUploadHistory", fields: [reportId], references: [id])
+
+  @@index([createdAt])
+}
+
+model Medicine {
+  id        String   @id @map("_id") @default(auto()) @db.ObjectId
+  userId    String
+  name      String
+  source    String
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+}
