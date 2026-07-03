@@ -71,3 +71,20 @@ model Medicine {
   @@index([userId])
   @@index([createdAt])
 }
+
+enum ChatRole {
+  user
+  assistant
+  system
+}
+
+model Chat {
+  id        String   @id @map("_id") @default(auto()) @db.ObjectId
+  userId    String?
+  role      ChatRole
+  message   String
+  timestamp DateTime @default(now())
+
+  @@index([userId])
+  @@index([timestamp])
+}

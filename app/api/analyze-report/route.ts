@@ -18,6 +18,11 @@ export async function POST(request: NextRequest) {
   let reportId: string | null = null
 
   try {
+    // Ensure required env is present for production
+    if (!process.env.DATABASE_URL) {
+      console.error('Missing DATABASE_URL')
+      return NextResponse.json({ error: 'DATABASE_URL is not configured on the server.' }, { status: 503 })
+    }
     const user = await getSessionUser()
     if (!user?.id) {
       return unauthorizedResponse()
@@ -49,7 +54,9 @@ export async function POST(request: NextRequest) {
     const arrayBuffer = await file.arrayBuffer()
     const buffer = Buffer.from(arrayBuffer)
 
-    const report = await prisma.medicalReport.create({
+    let report
+    try {
+      report = await prisma.medicalReport.create({
       data: {
         userId: user.id,
         fileName: file.name,
@@ -57,16 +64,24 @@ export async function POST(request: NextRequest) {
         fileSize: file.size,
         status: 'PROCESSING',
       },
-    })
+      })
+    } catch (dbErr) {
+      console.error('DB create report failed:', dbErr)
+      return NextResponse.json({ error: 'Failed to create report record.' }, { status: 500 })
+    }
     reportId = report.id
 
-    await prisma.uploadHistory.create({
+    try {
+      await prisma.uploadHistory.create({
       data: {
         reportId: report.id,
         action: 'UPLOAD',
         status: 'PROCESSING',
       },
-    })
+      })
+    } catch (dbErr) {
+      console.error('DB create uploadHistory failed:', dbErr)
+    }
 
     let extractedText = ''
     let analysis
@@ -83,7 +98,14 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: message }, { status: 422 })
       }
 
-      analysis = await analyzeTextWithGemini(extractedText)
+      try {
+        analysis = await analyzeTextWithGemini(extractedText)
+      } catch (aiErr) {
+        console.error('Gemini analysis failed:', aiErr)
+        const message = aiErr instanceof Error ? aiErr.message : 'AI analysis failed.'
+        await markReportFailed(report.id, message)
+        return NextResponse.json({ error: message }, { status: 502 })
+      }
     } else if (isImageFile(file)) {
       const base64Data = buffer.toString('base64')
       const result = await analyzeImageWithGemini(base64Data, mimeType)
@@ -97,44 +119,63 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const savedAnalysis = await prisma.analysisResult.create({
-      data: {
-        reportId: report.id,
-        summary: analysis.summary,
-        risk: analysis.risk,
-        recoveryScore: analysis.recoveryScore,
-        conditions: stringifyArray(analysis.conditions),
-        medicines: stringifyArray(analysis.medicines),
-        recommendations: stringifyArray(analysis.recommendations),
-        warnings: stringifyArray(analysis.warnings),
-        followUp: analysis.followUp,
-        doctorAdvice: analysis.doctorAdvice,
-        confidence: analysis.confidence,
-        rawResponse: JSON.stringify(analysis),
-      },
-    })
+    let savedAnalysis
+    try {
+      savedAnalysis = await prisma.analysisResult.create({
+        data: {
+          reportId: report.id,
+          summary: analysis.summary,
+          risk: analysis.risk,
+          recoveryScore: analysis.recoveryScore,
+          conditions: stringifyArray(analysis.conditions),
+          medicines: stringifyArray(analysis.medicines),
+          recommendations: stringifyArray(analysis.recommendations),
+          warnings: stringifyArray(analysis.warnings),
+          followUp: analysis.followUp,
+          doctorAdvice: analysis.doctorAdvice,
+          confidence: analysis.confidence,
+          rawResponse: JSON.stringify(analysis),
+        },
+      })
+    } catch (dbErr) {
+      console.error('DB create analysisResult failed:', dbErr)
+      await markReportFailed(report.id, 'Failed to save analysis result')
+      return NextResponse.json({ error: 'Failed to save analysis result.' }, { status: 500 })
+    }
 
-    await prisma.medicalReport.update({
-      where: { id: report.id },
-      data: {
-        extractedText,
-        status: 'COMPLETED',
-      },
-    })
+    try {
+      await prisma.medicalReport.update({
+        where: { id: report.id },
+        data: {
+          extractedText,
+          status: 'COMPLETED',
+        },
+      })
+    } catch (dbErr) {
+      console.error('DB update medicalReport failed:', dbErr)
+    }
 
-    await prisma.uploadHistory.update({
-      where: { reportId: report.id },
-      data: { status: 'COMPLETED' },
-    })
+    try {
+      await prisma.uploadHistory.update({
+        where: { reportId: report.id },
+        data: { status: 'COMPLETED' },
+      })
+    } catch (dbErr) {
+      console.error('DB update uploadHistory failed:', dbErr)
+    }
 
     if (analysis.medicines.length > 0) {
-      await prisma.medicine.createMany({
-        data: analysis.medicines.map((name) => ({
-          userId: user.id,
-          name,
-          source: report.fileName,
-        })),
-      })
+      try {
+        await prisma.medicine.createMany({
+          data: analysis.medicines.map((name) => ({
+            userId: user.id,
+            name,
+            source: report.fileName,
+          })),
+        })
+      } catch (dbErr) {
+        console.error('DB createMany medicines failed:', dbErr)
+      }
     }
 
     const payload = analysisResultToData(savedAnalysis, {

@@ -20,8 +20,12 @@ export async function GET(
       include: { analysis: true },
     })
 
-    if (!report?.analysis) {
+    if (!report) {
       return NextResponse.json({ error: 'Report not found.' }, { status: 404 })
+    }
+
+    if (!report.analysis) {
+      return NextResponse.json({ error: 'Analysis not found for this report.' }, { status: 404 })
     }
 
     return NextResponse.json(

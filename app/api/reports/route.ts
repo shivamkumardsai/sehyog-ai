@@ -18,7 +18,7 @@ export async function GET() {
     })
 
     return NextResponse.json(
-      reports.map((report: MedicalReportWithAnalysis) => ({
+      reports.map((report) => ({
         id: report.id,
         fileName: report.fileName,
         fileType: report.fileType,
