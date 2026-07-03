@@ -1,3 +1,9 @@
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
+
+
+
+
 import { NextResponse } from 'next/server'
 import { GoogleGenAI } from '@google/genai'
 import { createChatMessage, type ChatCreatePayload } from '@/lib/chat'
